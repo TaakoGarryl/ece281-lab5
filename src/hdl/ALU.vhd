@@ -23,11 +23,12 @@
 --|
 --| ALU OPCODES:
 --|
---|     ADD     000
---|
---|
---|
---|
+--|     ADD     001  
+--|     SUB     010  
+--|     Shift_L 011  
+--|     Shift_R 100  
+--|     Bit_and 101  
+--|     Bit_or  110
 --+----------------------------------------------------------------------------
 library ieee;
   use ieee.std_logic_1164.all;
@@ -35,17 +36,32 @@ library ieee;
 
 
 entity ALU is
--- TODO
+    Port(
+        i_A_B : std_logic_vector( 7 downto 0);
+        i_op : std_logic_vector( 2 downto 0);
+        o_flag_C : std_logic;
+        o_flag_Z : std_logic;
+        o_flag_S : std_logic
+        );
 end ALU;
 
 architecture behavioral of ALU is 
-  
+     
 	-- declare components and signals
-
-  
+    component FullAdder is
+        port(
+            -- Switches
+            sw        :    in  std_logic_vector(7 downto 0)
+            -- LEDs
+          --  led        :    out    std_logic_vector(1 downto 0)
+        );
+    end component FullAdder;
+    
+   signal w_operand1 : std_logic_vector( 7 downto 0);
+   signal w_operand2 : std_logic
 begin
 	-- PORT MAPS ----------------------------------------
-
+    
 	
 	
 	-- CONCURRENT STATEMENTS ----------------------------
