@@ -91,14 +91,16 @@ architecture behavioral of ALU is
     
    signal w_operand1 : std_logic_vector( 7 downto 0);
    signal w_operand2_pos : std_logic_vector( 7 downto 0);
-   signal w_operand2_neg : std_logic_vector( 7 downto 0);
+
    signal w_and : std_logic_vector( 7 downto 0);
    signal w_or : std_logic_vector( 7 downto 0);
    signal w_add : std_logic_vector( 7 downto 0);
-   signal w_neg : std_logic;
+   signal w_neg : std_logic_vector( 7downto 0);
    signal w_shifted : std_logic_vector( 7 downto 0);
+   
    signal w_flag_C :std_logic;
    signal w_flag_Z : std_logic;
+   signal w_flag_neg : std_logic;
 begin
 	-- PORT MAPS ----------------------------------------
 	 FA_inst : FullAdder port map (
@@ -109,13 +111,7 @@ begin
        );
 	
 	
-	 SUB_inst: twoscomp_decimal port map (
-              i_binary => w_operand2_neg,
-              o_negative => w_neg, -- Output negative flag
-              o_hundreds => open, -- Unused for now
-              o_tens => open,     -- Unused for now
-              o_ones => open      -- Unused for now
-          );
+	
           
      AND_OR_inst: Bitcompare port map (
         i_1 => w_operand1,
@@ -137,7 +133,8 @@ begin
 	add_sub_AO : process (i_op, i_B, i_A)
         begin
         if i_op = "010" then  -- Subtract
-                w_operand2_pos  <= w_operand2_neg;
+                w_neg <= i_B;
+                w_operand2_pos <= std_logic_vector(unsigned(not w_neg) + 1);
                 w_add <= o_op_result;
                 if i_A = i_B then
                     w_flag_Z <= '1';
@@ -162,8 +159,9 @@ begin
                 w_add <= o_op_result;
             end if;
     end process add_sub_AO;
-        
+    w_flag_neg <= o_op_result(7);   
     w_flag_C <= o_flag_C;
-    w_add <= o_op_result;
+    w_flag_neg <= o_flag_S;
     w_flag_Z <= o_flag_Z;
+    
 end behavioral;

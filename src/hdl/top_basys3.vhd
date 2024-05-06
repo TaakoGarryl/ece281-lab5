@@ -25,8 +25,15 @@ library ieee;
   use ieee.numeric_std.all;
 
 
-entity top_basys3 is
--- TODO
+entity top_basys3 is port(
+    seg :   out std_logic_vector(6 downto 0);
+    an  :   out std_logic_vector(3 downto 0);
+    clk     :   in std_logic;
+    sw  	:   in std_logic_vector(15 downto 0);
+    led 	:   out std_logic_vector(15 downto 0);
+    btnU    :   in std_logic;
+    btnC    :   in std_logic
+    );
 end top_basys3;
 
 architecture top_basys3_arch of top_basys3 is 
@@ -72,20 +79,68 @@ architecture top_basys3_arch of top_basys3 is
                 );
             end component clock_divider;
             
+    component ALU is
+                Port(
+                    i_A : std_logic_vector( 7 downto 0);
+                    i_B : std_logic_vector( 7 downto 0);
+                    i_op : std_logic_vector( 2 downto 0);
+                    o_op_result : std_logic_vector( 7 downto 0);
+                    o_flag_C : std_logic := '0';
+                    o_flag_Z : std_logic := '0';
+                    o_flag_S : std_logic := '0'
+                    );
+            end component ALU;
+
             
+    
+    signal w_A : std_logic_vector(7 downto 0);
+    signal w_B : std_logic_vector(7 downto 0);
+    signal w_state : std_logic_vector(3 downto 0);
+    signal w_op : std_logic_vector(2 downto 0);
+    signal w_flag : std_logic_vector(2 downto 0);
+    signal w_op_result : std_logic_vector( 7 downto 0);
+    
+    signal w_bin : std_logic_vector( 7 downto 0);
+    signal w_sign :std_logic; 
+    signal w_hund :std_logic_vector( 3 downto 0);
+    signal w_ten : std_logic_vector( 3 downto 0); 
+    signal w_one : std_logic_vector( 3 downto 0); 
+    
     signal w_display_num : std_logic_vector(3 downto 0);
     signal w_display_light : std_logic;          
     signal w_clk : std_logic;
-    signal w_reset_clk : std_logic;
+    signal w_reset : std_logic;
     
-            
+    signal f_Q : std_logic_vector( 2 downto 0) := "000";
+    signal f_Q_next:  std_logic_vector( 2 downto 0) := "000";   
 begin
 	-- PORT MAPS ----------------------------------------
-
+    ALU_inst : ALU
+        port map(
+            i_A => w_A,
+            i_B => w_B,
+            i_op => w_op,
+            o_op_result => w_op_result,
+            o_flag_Z => w_flag(0),
+            o_flag_S => w_flag(1),
+            o_flag_C => w_flag(2)
+	);
+	
+	twos_inst :  twoscomp_decimal
+	   port map(
+	     i_binary => w_bin,
+	     o_negative => w_sign,
+	     o_hundreds => w_hund,
+	     o_tens => w_ten,
+	     o_ones  => w_one
+	);
 	
 	
 	-- CONCURRENT STATEMENTS ----------------------------
-	
-	
+	f_Q_next(0) <= btnU or (f_Q(3) and btnC);
+	f_Q_next(1) <= (f_Q(0) and btnC);
+	f_Q_next(2) <= (f_Q(1) and btnC);
+	f_Q_next(3) <= (f_Q(2) and btnC);
+      	
 	
 end top_basys3_arch;
