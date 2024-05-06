@@ -135,7 +135,31 @@ begin
 	     o_ones  => w_one
 	);
 	
-	
+	clk_inst : clock_divider
+	   port map(
+	       i_clk => clk,
+	       i_reset => btnU,
+	       o_clk => w_clk
+	   );
+	   
+	   TDM_inst : TDM4
+	       port map(
+	       i_clk => w_clk,
+           i_reset => btnU,
+           i_D3 => w_flag,
+           i_D2 => w_hund,
+           i_D1 => w_ten,
+           i_D0 => w_one,
+           o_data => w_display_num,
+           o_sel => an
+           
+	       );
+	   
+	   decode_inst : sevenSegDecoder
+	   port map(
+	   i_D => w_display_num,
+	   o_S => seg
+	   );
 	-- CONCURRENT STATEMENTS ----------------------------
 	f_Q_next(0) <= btnU or (f_Q(3) and btnC);
 	f_Q_next(1) <= (f_Q(0) and btnC);
