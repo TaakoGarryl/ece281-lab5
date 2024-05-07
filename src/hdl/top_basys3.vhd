@@ -92,7 +92,7 @@ architecture top_basys3_arch of top_basys3 is
                end component Rigister;  
         
     component clock_divider is
-    generic ( constant k_DIV : natural := 50000000	); -- How many clk cycles until slow clock toggles Goal HZ of 2
+    generic ( constant k_DIV : natural := 25000	); -- How many clk cycles until slow clock toggles Goal HZ of 2
                 port (
                         i_clk    : in std_logic;
                         i_reset  : in std_logic;           -- asynchronous
@@ -178,7 +178,7 @@ begin
 	);
 	
 	clk_inst : clock_divider
-	   generic map ( k_DIV => 50000000)
+	   generic map ( k_DIV => 25000)
 	   port map(
 	       i_clk => clk,
 	       i_reset => btnU,
@@ -236,5 +236,6 @@ begin
             end if;
             end process;
      
+     led(12 downto 3) <= (others => '0');
 	
 end top_basys3_arch;

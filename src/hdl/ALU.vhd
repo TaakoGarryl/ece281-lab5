@@ -158,8 +158,11 @@ begin
             end if;
     end process add_sub_AO;
    
-    
-     o_op_result(7) <= w_flag_neg ;   
+     
+     
+     w_operand1 <= i_A;
+     w_flag_neg <= w_add(7) ; 
+       
      o_flag_C <= w_flag_C;
      o_flag_S <= w_flag_neg;
      o_flag_Z <= w_flag_Z;
