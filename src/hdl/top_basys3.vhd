@@ -157,6 +157,17 @@ begin
             o_flag_C => w_flag(2)
 	);
 	
+--	w_bin <= w_A when w_state = "0010" else
+  --               w_A when w_state = "0010" else
+    --             w_B when w_state = "0100" else
+      --           w_op_result when w_state = "1000" else
+        --         "00000000"
+          --       ; 
+     w_bin <= w_A when w_state = "0010" else
+              w_B when w_state = "0100" else
+              w_op_result when w_state = "1000" else
+              "00000000";            
+	
 	twos_inst :  twoscomp_decimal
 	   port map(
 	     i_binary => w_bin,
@@ -200,10 +211,7 @@ begin
 	   o_cycle => w_f_Q
 	   );
 	   
-	  
-	   
-	  
-	   
+
 	   led(0) <= w_f_Q(0);
                led(1) <= w_f_Q(1);
                led(2) <= w_f_Q(2);
@@ -214,19 +222,11 @@ begin
 	    led(13) <= w_flag(2);
 	-- CONCURRENT STATEMENTS ----------------------------
 	
-	result_mux : process (w_op_result, w_B, w_A, w_state)
-            begin
-            if w_state = "0010" then  
-                    w_bin <= w_A;                    
-            elsif w_state = "0100" then 
-                    w_bin <= w_B;                    
-            elsif w_state = "1000" then 
-                    w_bin <= w_op_result;               
-            else  
-                  w_bin <= "00000000";
-                end if;
-        end process result_mux;
-	 
+           
+        --  w_bin <= w_A when (w_state = "0010") else 
+        --  w_bin <= w_B when (w_state ="0100") else
+        --  w_bin <= w_op_result when (w_state = "1000") else
+          
      negative_sign : process (w_sign) 	
       begin
         if w_sign = '1' then
