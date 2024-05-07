@@ -29,7 +29,7 @@ entity top_basys3 is port(
     seg :   out std_logic_vector(6 downto 0);
     an  :   out std_logic_vector(3 downto 0);
     clk     :   in std_logic;
-    sw  	:   in std_logic_vector(15 downto 0);
+    sw  	:   in std_logic_vector(7 downto 0);
     led 	:   out std_logic_vector(15 downto 0);
     btnU    :   in std_logic;
     btnC    :   in std_logic
@@ -39,6 +39,17 @@ end top_basys3;
 architecture top_basys3_arch of top_basys3 is 
   
 	-- declare components and signals
+	
+	component CPU_fsm is
+    port (
+        i_adv     : in  STD_LOGIC;
+        i_reset     : in  STD_LOGIC;
+    
+        o_cycle   : out  STD_LOGIC_VECTOR(3 downto 0)
+    );
+	end component CPU_fsm;
+	
+	
     component TDM4 is
         generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
             Port ( i_clk        : in  STD_LOGIC;
@@ -68,7 +79,17 @@ architecture top_basys3_arch of top_basys3 is
                 o_ones: out std_logic_vector(3 downto 0)
             );
         end component twoscomp_decimal;  
-       
+     
+    component Rigister is
+                 Port ( 
+                   i_sw : std_logic_vector( 7 downto 0);
+                   i_state : std_logic_vector( 3 downto 0):= "0001";
+                   i_btnC : std_logic;
+                   o_op : std_logic_vector( 2 downto 0):= "001";
+                   o_A : std_logic_vector( 7 downto 0);
+                   o_B : std_logic_vector( 7 downto 0)
+               );
+               end component Rigister;  
         
     component clock_divider is
     generic ( constant k_DIV : natural := 50000000	); -- How many clk cycles until slow clock toggles Goal HZ of 2
@@ -97,11 +118,12 @@ architecture top_basys3_arch of top_basys3 is
     signal w_B : std_logic_vector(7 downto 0);
     signal w_state : std_logic_vector(3 downto 0);
     signal w_op : std_logic_vector(2 downto 0);
-    signal w_flag : std_logic_vector(2 downto 0);
+    signal w_flag : std_logic_vector(3 downto 0);
     signal w_op_result : std_logic_vector( 7 downto 0);
     
     signal w_bin : std_logic_vector( 7 downto 0);
     signal w_sign :std_logic; 
+    signal w_neg_sign: std_logic_vector(3 downto 0);
     signal w_hund :std_logic_vector( 3 downto 0);
     signal w_ten : std_logic_vector( 3 downto 0); 
     signal w_one : std_logic_vector( 3 downto 0); 
@@ -111,10 +133,19 @@ architecture top_basys3_arch of top_basys3 is
     signal w_clk : std_logic;
     signal w_reset : std_logic;
     
-    signal f_Q : std_logic_vector( 2 downto 0) := "000";
-    signal f_Q_next:  std_logic_vector( 2 downto 0) := "000";   
+    signal w_f_Q : std_logic_vector(3 downto 0);
 begin
 	-- PORT MAPS ----------------------------------------
+	 store_inst : Rigister
+          port map( 
+          i_sw => sw(7 downto 0),
+          i_state => w_f_Q,
+          i_btnC => btnC,
+          o_op => w_op,
+          o_A => w_A,
+          o_B => w_B
+          );
+	
     ALU_inst : ALU
         port map(
             i_A => w_A,
@@ -136,6 +167,7 @@ begin
 	);
 	
 	clk_inst : clock_divider
+	   generic map ( k_DIV => 50000000)
 	   port map(
 	       i_clk => clk,
 	       i_reset => btnU,
@@ -146,7 +178,7 @@ begin
 	       port map(
 	       i_clk => w_clk,
            i_reset => btnU,
-           i_D3 => w_flag,
+           i_D3 => w_neg_sign,
            i_D2 => w_hund,
            i_D1 => w_ten,
            i_D0 => w_one,
@@ -160,11 +192,49 @@ begin
 	   i_D => w_display_num,
 	   o_S => seg
 	   );
+	   
+	   fsm_inst : CPU_fsm
+	   port map(
+	   i_adv => btnC,
+	   i_reset => btnU,
+	   o_cycle => w_f_Q
+	   );
+	   
+	  
+	   
+	  
+	   
+	   led(0) <= w_f_Q(0);
+               led(1) <= w_f_Q(1);
+               led(2) <= w_f_Q(2);
+               led(3) <= w_f_Q(3);
+               
+	    led(14) <= w_flag(0);
+	    led(15) <= w_flag(1);
+	    led(13) <= w_flag(2);
 	-- CONCURRENT STATEMENTS ----------------------------
-	f_Q_next(0) <= btnU or (f_Q(3) and btnC);
-	f_Q_next(1) <= (f_Q(0) and btnC);
-	f_Q_next(2) <= (f_Q(1) and btnC);
-	f_Q_next(3) <= (f_Q(2) and btnC);
-      	
+	
+	result_mux : process (w_op_result, w_B, w_A, w_state)
+            begin
+            if w_state = "0010" then  
+                    w_bin <= w_A;                    
+            elsif w_state = "0100" then 
+                    w_bin <= w_B;                    
+            elsif w_state = "1000" then 
+                    w_bin <= w_op_result;               
+            else  
+                  w_bin <= "00000000";
+                end if;
+        end process result_mux;
+	 
+     negative_sign : process (w_sign) 	
+      begin
+        if w_sign = '1' then
+            w_neg_sign <= "1111";
+        else
+            w_neg_sign <= "1110";
+            end if;
+            end process;
+     
 	
 end top_basys3_arch;

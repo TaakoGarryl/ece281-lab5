@@ -110,8 +110,6 @@ begin
            o_CarryOut => w_flag_C -- Set the carry-out flag
        );
 	
-	
-	
           
      AND_OR_inst: Bitcompare port map (
         i_1 => w_operand1,
