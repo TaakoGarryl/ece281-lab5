@@ -82,12 +82,12 @@ architecture top_basys3_arch of top_basys3 is
      
     component Rigister is
                  Port ( 
-                   i_sw : std_logic_vector( 7 downto 0);
-                   i_state : std_logic_vector( 3 downto 0):= "0001";
-                   i_btnC : std_logic;
-                   o_op : std_logic_vector( 2 downto 0):= "001";
-                   o_A : std_logic_vector( 7 downto 0);
-                   o_B : std_logic_vector( 7 downto 0)
+                   i_sw : in std_logic_vector( 7 downto 0);
+                   i_state : in std_logic_vector( 3 downto 0):= "0001";
+                   i_btnC : in std_logic;
+                   o_operation : out std_logic_vector( 2 downto 0):= "001";
+                   o_A : out std_logic_vector( 7 downto 0);
+                   o_B : out std_logic_vector( 7 downto 0)
                );
                end component Rigister;  
         
@@ -102,13 +102,13 @@ architecture top_basys3_arch of top_basys3 is
             
     component ALU is
                 Port(
-                    i_A : std_logic_vector( 7 downto 0);
-                    i_B : std_logic_vector( 7 downto 0);
-                    i_op : std_logic_vector( 2 downto 0);
-                    o_op_result : std_logic_vector( 7 downto 0);
-                    o_flag_C : std_logic := '0';
-                    o_flag_Z : std_logic := '0';
-                    o_flag_S : std_logic := '0'
+                    i_A : in std_logic_vector( 7 downto 0);
+                    i_B : in std_logic_vector( 7 downto 0);
+                    i_op : in std_logic_vector( 2 downto 0);
+                    o_op_result : out std_logic_vector( 7 downto 0);
+                    o_flag_C :out std_logic := '0';
+                    o_flag_Z : out std_logic := '0';
+                    o_flag_S : out std_logic := '0'
                     );
             end component ALU;
 
@@ -141,7 +141,7 @@ begin
           i_sw => sw(7 downto 0),
           i_state => w_f_Q,
           i_btnC => btnC,
-          o_op => w_op,
+          o_operation => w_op,
           o_A => w_A,
           o_B => w_B
           );
@@ -230,9 +230,9 @@ begin
      negative_sign : process (w_sign) 	
       begin
         if w_sign = '1' then
-            w_neg_sign <= "1111";
+            w_neg_sign <= "0111";
         else
-            w_neg_sign <= "1110";
+            w_neg_sign <= "1111";
             end if;
             end process;
      

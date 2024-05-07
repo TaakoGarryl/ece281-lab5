@@ -37,13 +37,13 @@ library ieee;
 
 entity ALU is
     Port(
-        i_A : std_logic_vector( 7 downto 0);
-        i_B : std_logic_vector( 7 downto 0);
-        i_op : std_logic_vector( 2 downto 0);
-        o_op_result : std_logic_vector( 7 downto 0);
-        o_flag_C : std_logic;
-        o_flag_Z : std_logic;
-        o_flag_S : std_logic
+        i_A : in std_logic_vector( 7 downto 0);
+        i_B : in std_logic_vector( 7 downto 0);
+        i_op : in std_logic_vector( 2 downto 0);
+        o_op_result : out std_logic_vector( 7 downto 0);
+        o_flag_C : out std_logic;
+        o_flag_Z : out std_logic;
+        o_flag_S : out std_logic
         );
 end ALU;
 
@@ -133,7 +133,7 @@ begin
         if i_op = "010" then  -- Subtract
                 w_neg <= i_B;
                 w_operand2_pos <= std_logic_vector(unsigned(not w_neg) + 1);
-                w_add <= o_op_result;
+                o_op_result <= w_add;
                 if i_A = i_B then
                     w_flag_Z <= '1';
                 else
@@ -141,25 +141,26 @@ begin
                 end if;
                 
             elsif i_op = "011" then -- Shift left
-                w_shifted <= o_op_result;
+                o_op_result  <= w_shifted;
                 
             elsif i_op = "100" then -- Shift right
-                w_shifted <= o_op_result;
+               o_op_result <= w_shifted ;
                 
             elsif i_op = "101" then -- Bitwise AND
-                w_add <= o_op_result;
+               o_op_result  <= w_add;
                 
             elsif i_op = "110" then -- Bitwise OR
-                w_or <= o_op_result;
+               o_op_result  <= w_or;
                 
             else  -- Default case: Addition
                 w_operand2_pos <= i_B;
-                w_add <= o_op_result;
+                o_op_result <= w_add ;
             end if;
     end process add_sub_AO;
-    w_flag_neg <= o_op_result(7);   
-    w_flag_C <= o_flag_C;
-    w_flag_neg <= o_flag_S;
-    w_flag_Z <= o_flag_Z;
+   
     
+     o_op_result(7) <= w_flag_neg ;   
+     o_flag_C <= w_flag_C;
+     o_flag_S <= w_flag_neg;
+     o_flag_Z <= w_flag_Z;
 end behavioral;
