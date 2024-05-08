@@ -194,9 +194,9 @@ begin
            i_D1 => w_ten,
            i_D0 => w_one,
            o_data => w_display_num,
-           o_sel => an
-           
+           o_sel => an          
 	       );
+	 
 	   
 	   decode_inst : sevenSegDecoder
 	   port map(
@@ -230,12 +230,12 @@ begin
      negative_sign : process (w_sign) 	
       begin
         if w_sign = '1' then
-            w_neg_sign <= "0111";
-        else
             w_neg_sign <= "1111";
+        else
+            w_neg_sign <= "0000";
             end if;
             end process;
      
-     led(12 downto 3) <= (others => '0');
+     led(12 downto 4) <= (others => '0');
 	
 end top_basys3_arch;
