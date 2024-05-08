@@ -78,9 +78,9 @@ begin
 	-- 2 Bit counter Process ----------------------------
 	-- counter rolls over automatically
 	-- asynchronous reset to "00"
-	twoBitCounter_proc : process(i_clk, i_reset)
+	twoBitCounter_proc : process(i_clk, i_reset, i_state)
 	begin
-		if i_reset = '1' then
+		if (i_reset = '1' or i_state = "0001") then
 			f_sel <= "00";
 		elsif rising_edge(i_clk) then
 			f_sel <= f_sel + 1;
@@ -100,8 +100,7 @@ begin
 	o_SEL  <=  "0111" when f_sel = "11" else
 			   "1011" when f_sel = "10" else
 			   "1101" when f_sel = "01" else
-			   "1111" when i_reset = '1' else
-			   "1111" when i_state = "0001" else
+			    
 			   "1110";
 		
 end behavioral;

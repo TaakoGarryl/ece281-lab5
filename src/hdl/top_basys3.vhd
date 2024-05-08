@@ -218,10 +218,15 @@ begin
        led(1) <= w_f_Q(1);
        led(2) <= w_f_Q(2);
        led(3) <= w_f_Q(3);
+       
+       
                
-	   led(14) <= w_flag(0);
-	   led(15) <= w_flag(1);
-	   led(13) <= w_flag(2);
+	   led(14) <= w_flag(0) when w_f_Q = "1000"else
+	   '0';
+	   led(15) <= w_flag(1) when w_f_Q = "1000"else
+             '0';
+	   led(13) <= w_flag(2) when w_f_Q = "1000"else
+                   '0';
 	-- CONCURRENT STATEMENTS ----------------------------
 	
            
