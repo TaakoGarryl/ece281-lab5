@@ -80,9 +80,8 @@ begin
 	-- asynchronous reset to "00"
 	twoBitCounter_proc : process(i_clk, i_reset, i_state)
 	begin
-		if (i_reset = '1' or i_state = "0001") then
-			f_sel <= "00";
-		elsif rising_edge(i_clk) then
+		
+		if rising_edge(i_clk) then
 			f_sel <= f_sel + 1;
 		end if;
 	end process twoBitCounter_proc;
@@ -95,12 +94,13 @@ begin
 	o_DATA <= i_D3 when f_sel = "11" else
 			  i_D2 when f_sel = "10" else
 			  i_D1 when f_sel = "01" else
+			 -- "0000" when i_state = "0001" else
 			  i_D0;
 			  
-	o_SEL  <=  "0111" when f_sel = "11" else
+	o_SEL  <=  "1111" when (i_state = "0001" or i_reset = '1') else
+	           "0111" when f_sel = "11" else
 			   "1011" when f_sel = "10" else
 			   "1101" when f_sel = "01" else
-			    
 			   "1110";
 		
 end behavioral;
