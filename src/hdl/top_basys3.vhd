@@ -26,6 +26,7 @@ library ieee;
 
 
 entity top_basys3 is port(
+    test : in std_logic_vector(7 downto 0);
     seg :   out std_logic_vector(6 downto 0);
     an  :   out std_logic_vector(3 downto 0);
     clk     :   in std_logic;
@@ -33,6 +34,7 @@ entity top_basys3 is port(
     led 	:   out std_logic_vector(15 downto 0);
     btnU    :   in std_logic;
     btnC    :   in std_logic
+    
     );
 end top_basys3;
 
@@ -157,11 +159,11 @@ begin
             o_flag_C => w_flag(2)
 	);
 	
-        
-     w_bin <= w_A when w_state = "0010" else
-              w_B when w_state = "0100" else
-              w_op_result when w_state = "1000" else
-              "00000000";            
+    w_bin <= test;    
+    -- w_bin <= w_A when w_state = "0010" else
+      --        w_B when w_state = "0100" else
+        --      w_op_result when w_state = "1000" else
+          --    "00000000";            
 	
 	twos_inst :  twoscomp_decimal
 	   port map(
