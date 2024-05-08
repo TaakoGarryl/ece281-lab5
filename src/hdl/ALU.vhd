@@ -31,139 +31,94 @@
 --|     Bit_or  110
 --+----------------------------------------------------------------------------
 library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
-
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity ALU is
     Port(
-        i_A : in std_logic_vector( 7 downto 0);
-        i_B : in std_logic_vector( 7 downto 0);
-        i_op : in std_logic_vector( 2 downto 0);
-        o_op_result : out std_logic_vector( 7 downto 0);
+        i_A : in std_logic_vector(7 downto 0);
+        i_B : in std_logic_vector(7 downto 0);
+        i_op : in std_logic_vector(2 downto 0);
+        o_op_result : out std_logic_vector(7 downto 0);
         o_flag_C : out std_logic;
         o_flag_Z : out std_logic;
         o_flag_S : out std_logic
-        );
+    );
 end ALU;
 
-architecture behavioral of ALU is 
-     
-	-- declare components and signals
+architecture behavioral of ALU is
+    signal w_and, w_or, w_add, w_neg, w_shifted : std_logic_vector(7 downto 0);
+    signal w_flag_C, w_flag_Z, w_flag_neg : std_logic;
+
     component FullAdder is
         port(
-           i_1, i_2: in std_logic_vector(7 downto 0);
-                -- LEDs
-                o_Sum: out std_logic_vector(7 downto 0);
-                o_CarryOut: out std_logic
+            i_1, i_2 : in std_logic_vector(7 downto 0);
+            o_Sum : out std_logic_vector(7 downto 0);
+            o_CarryOut : out std_logic
         );
     end component FullAdder;
-    
-    component twoscomp_decimal is
-        port (
-            i_binary: in std_logic_vector(7 downto 0);
-            o_negative: out std_logic;
-            o_hundreds: out std_logic_vector(3 downto 0);
-            o_tens: out std_logic_vector(3 downto 0);
-            o_ones: out std_logic_vector(3 downto 0)
-        );
-    end component twoscomp_decimal;
-    
+
     component Bitcompare is
         port(
-            -- Switches
-            i_1, i_2: in std_logic_vector(7 downto 0);
-            -- LEDs
-            o_Sum_AND: out std_logic_vector(7 downto 0);
-            o_Sum_OR: out std_logic_vector(7 downto 0)
-          --  o_CarryOut: out std_logic
+            i_1, i_2 : in std_logic_vector(7 downto 0);
+            o_Sum_AND : out std_logic_vector(7 downto 0);
+            o_Sum_OR : out std_logic_vector(7 downto 0)
         );
     end component Bitcompare;
-    
-    component shifty is
-     Port(
-        i_A : std_logic_vector( 7 downto 0);
-        i_B : std_logic_vector( 7 downto 0);
-        i_D : std_logic;
-        o_shifted : std_logic_vector( 7 downto 0)
-     );
-    end component shifty;
-    
-   signal w_operand1 : std_logic_vector( 7 downto 0);
-   signal w_operand2_pos : std_logic_vector( 7 downto 0);
 
-   signal w_and : std_logic_vector( 7 downto 0);
-   signal w_or : std_logic_vector( 7 downto 0);
-   signal w_add : std_logic_vector( 7 downto 0);
-   signal w_neg : std_logic_vector( 7downto 0);
-   signal w_shifted : std_logic_vector( 7 downto 0);
-   
-   signal w_flag_C :std_logic;
-   signal w_flag_Z : std_logic;
-   signal w_flag_neg : std_logic;
+    component shifty is
+        Port(
+            i_A : in std_logic_vector(7 downto 0);
+            i_B : in std_logic_vector(7 downto 0);
+            i_D : in std_logic;
+            o_shifted : out std_logic_vector(7 downto 0)
+        );
+    end component shifty;
+
 begin
-	-- PORT MAPS ----------------------------------------
-	 FA_inst : FullAdder port map (
-           i_1 => w_operand1,
-           i_2 => w_operand2_pos,
-           o_Sum => w_add, -- added value
-           o_CarryOut => w_flag_C -- Set the carry-out flag
-       );
-	
-          
-     AND_OR_inst: Bitcompare port map (
-        i_1 => w_operand1,
-        i_2 => w_operand2_pos,
+    FA_inst : FullAdder port map (
+        i_1 => i_A,
+        i_2 => i_B,
+        o_Sum => w_add,
+        o_CarryOut => w_flag_C
+    );
+
+    AND_OR_inst : Bitcompare port map (
+        i_1 => i_A,
+        i_2 => i_B,
         o_Sum_AND => w_and,
         o_Sum_OR => w_or
-        );
-            
-	shift_inst : shifty port map(
-	   i_A => w_operand1,
-	   i_B => w_operand2_pos,
-	   i_D => i_op(2),
-	   o_shifted => w_shifted
-	
-	);
-	-- CONCURRENT STATEMENTS ----------------------------
-	
-	
-	add_sub_AO : process (i_op, i_B, i_A)
-        begin
-        if i_op = "010" then  -- Subtract
-                w_neg <= i_B;
-                w_operand2_pos <= std_logic_vector(unsigned(not w_neg) + 1);
+    );
+
+    shift_inst : shifty port map(
+        i_A => i_A,
+        i_B => i_B,
+        i_D => i_op(2),
+        o_shifted => w_shifted
+    );
+
+    alu_operation : process(i_op, i_A, i_B)
+    begin
+        case i_op is
+            when "010" => -- Subtract
+                w_neg <= std_logic_vector(unsigned(not i_B) + 1);
                 o_op_result <= w_add;
-                if i_A = i_B then
-                    w_flag_Z <= '1';
-                else
-                    w_flag_Z <= '0';
-                end if;
-                
-            elsif i_op = "011" then -- Shift left
-                o_op_result  <= w_shifted;
-                
-            elsif i_op = "100" then -- Shift right
-               o_op_result <= w_shifted ;
-                
-            elsif i_op = "101" then -- Bitwise AND
-               o_op_result  <= w_add;
-                
-            elsif i_op = "110" then -- Bitwise OR
-               o_op_result  <= w_or;
-                
-            else  -- Default case: Addition
-                w_operand2_pos <= i_B;
-                o_op_result <= w_add ;
-            end if;
-    end process add_sub_AO;
-   
-     
-     
-     w_operand1 <= i_A;
-     w_flag_neg <= w_add(7) ; 
-       
-     o_flag_C <= w_flag_C;
-     o_flag_S <= w_flag_neg;
-     o_flag_Z <= w_flag_Z;
+            when "011" => -- Shift left
+                o_op_result <= w_shifted;
+            when "100" => -- Shift right
+                o_op_result <= w_shifted;
+            when "101" => -- Bitwise AND
+                o_op_result <= w_and;
+            when "110" => -- Bitwise OR
+                o_op_result <= w_or;
+            when others => -- Default case: Addition
+                o_op_result <= w_add;
+        end case;
+    end process alu_operation;
+
+    w_flag_Z <= '1' when w_add = "00000000" else '0';
+    w_flag_neg <= w_add(7);
+    o_flag_C <= w_flag_C;
+    o_flag_S <= w_flag_neg;
+    o_flag_Z <= w_flag_Z;
 end behavioral;

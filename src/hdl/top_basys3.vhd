@@ -84,7 +84,7 @@ architecture top_basys3_arch of top_basys3 is
                  Port ( 
                    i_sw : in std_logic_vector( 7 downto 0);
                    i_state : in std_logic_vector( 3 downto 0):= "0001";
-                   i_btnC : in std_logic;
+               --    i_btnC : in std_logic;
                    o_operation : out std_logic_vector( 2 downto 0):= "001";
                    o_A : out std_logic_vector( 7 downto 0);
                    o_B : out std_logic_vector( 7 downto 0)
@@ -140,7 +140,7 @@ begin
           port map( 
           i_sw => sw(7 downto 0),
           i_state => w_f_Q,
-          i_btnC => btnC,
+      --    i_btnC => btnC,
           o_operation => w_op,
           o_A => w_A,
           o_B => w_B
@@ -157,12 +157,7 @@ begin
             o_flag_C => w_flag(2)
 	);
 	
---	w_bin <= w_A when w_state = "0010" else
-  --               w_A when w_state = "0010" else
-    --             w_B when w_state = "0100" else
-      --           w_op_result when w_state = "1000" else
-        --         "00000000"
-          --       ; 
+        
      w_bin <= w_A when w_state = "0010" else
               w_B when w_state = "0100" else
               w_op_result when w_state = "1000" else
@@ -213,13 +208,13 @@ begin
 	   
 
 	   led(0) <= w_f_Q(0);
-               led(1) <= w_f_Q(1);
-               led(2) <= w_f_Q(2);
-               led(3) <= w_f_Q(3);
+       led(1) <= w_f_Q(1);
+       led(2) <= w_f_Q(2);
+       led(3) <= w_f_Q(3);
                
-	    led(14) <= w_flag(0);
-	    led(15) <= w_flag(1);
-	    led(13) <= w_flag(2);
+	   led(14) <= w_flag(0);
+	   led(15) <= w_flag(1);
+	   led(13) <= w_flag(2);
 	-- CONCURRENT STATEMENTS ----------------------------
 	
            
