@@ -26,7 +26,7 @@ library ieee;
 
 
 entity top_basys3 is port(
-    test : in std_logic_vector(7 downto 0);
+  --  test : in std_logic_vector(7 downto 0);
     seg :   out std_logic_vector(6 downto 0);
     an  :   out std_logic_vector(3 downto 0);
     clk     :   in std_logic;
@@ -116,14 +116,14 @@ architecture top_basys3_arch of top_basys3 is
 
             
     
-    signal w_A : std_logic_vector(7 downto 0);
-    signal w_B : std_logic_vector(7 downto 0);
-    signal w_state : std_logic_vector(3 downto 0);
-    signal w_op : std_logic_vector(2 downto 0);
+    signal w_A : std_logic_vector(7 downto 0) := "00000000";
+    signal w_B : std_logic_vector(7 downto 0) := "00000000";
+  --  signal w_state : std_logic_vector(3 downto 0);
+    signal w_op : std_logic_vector(2 downto 0) := "000";
     signal w_flag : std_logic_vector(3 downto 0);
     signal w_op_result : std_logic_vector( 7 downto 0);
     
-    signal w_bin : std_logic_vector( 7 downto 0);
+    signal w_bin : std_logic_vector( 7 downto 0) := "00000000";
     signal w_sign :std_logic; 
     signal w_neg_sign: std_logic_vector(3 downto 0);
     signal w_hund :std_logic_vector( 3 downto 0);
@@ -136,6 +136,7 @@ architecture top_basys3_arch of top_basys3 is
     signal w_reset : std_logic;
     
     signal w_f_Q : std_logic_vector(3 downto 0);
+    
 begin
 	-- PORT MAPS ----------------------------------------
 	 store_inst : Rigister
@@ -159,11 +160,13 @@ begin
             o_flag_C => w_flag(2)
 	);
 	
-    w_bin <= test;    
-    -- w_bin <= w_A when w_state = "0010" else
-      --        w_B when w_state = "0100" else
-        --      w_op_result when w_state = "1000" else
-          --    "00000000";            
+   -- w_bin <= test; 
+           
+      
+     w_bin <= w_A when w_f_Q = "0010" else
+               w_B when w_f_Q = "0100" else
+              w_op_result when w_f_Q = "1000"  else             
+              "00000000" when w_f_Q = "0001";            
 	
 	twos_inst :  twoscomp_decimal
 	   port map(
