@@ -55,7 +55,8 @@ use ieee.numeric_std.all;
 
 entity TDM4 is
 	generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
-    Port ( i_clk		: in  STD_LOGIC;
+    Port ( i_state      : in std_logic_vector (3 downto 0);
+           i_clk		: in  STD_LOGIC;
            i_reset		: in  STD_LOGIC; -- asynchronous
            i_D3 		: in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
 		   i_D2 		: in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
@@ -99,6 +100,8 @@ begin
 	o_SEL  <=  "0111" when f_sel = "11" else
 			   "1011" when f_sel = "10" else
 			   "1101" when f_sel = "01" else
+			   "1111" when i_reset = '1' else
+			   "1111" when i_state = "0001" else
 			   "1110";
 		
 end behavioral;

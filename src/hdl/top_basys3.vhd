@@ -54,7 +54,8 @@ architecture top_basys3_arch of top_basys3 is
 	
     component TDM4 is
         generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
-            Port ( i_clk        : in  STD_LOGIC;
+            Port ( i_state : in STD_LOGIC_VECTOR(3 downto 0);
+                   i_clk        : in  STD_LOGIC;
                    i_reset        : in  STD_LOGIC; -- asynchronous
                    i_D3         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
                    i_D2         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
@@ -187,6 +188,7 @@ begin
 	   
 	   TDM_inst : TDM4
 	       port map(
+	       i_state => w_f_Q,
 	       i_clk => w_clk,
            i_reset => btnU,
            i_D3 => w_neg_sign,

@@ -50,7 +50,7 @@ architecture behavioral of ALU is
     signal w_and, w_or, w_shifted : std_logic_vector(7 downto 0);
     signal w_add, w_neg : std_logic_vector( 7downto 0);
     signal w_flag_Z, w_flag_neg : std_logic;
-    signal w_chosen : std_logic_vector( 7 downto 0);
+    signal w_chosen : std_logic_vector( 7 downto 0) := "00000001";
     signal w_add_carry : std_logic;
     signal w_sub_carry : std_logic;
     
@@ -143,8 +143,8 @@ begin
     
     o_op_result <= w_chosen;
 
-    w_flag_Z <= '1' when  (w_chosen = "00000000") else '0';
-    w_flag_neg <= w_chosen(7);
+    w_flag_Z <= '1' when  (w_chosen = "00000000")  else '0';
+    w_flag_neg <= w_chosen(7) or i_A(7) or i_B(7);
     o_flag_C <= w_add_carry or w_sub_carry;
     o_flag_S <= w_flag_neg;
     o_flag_Z <= w_flag_Z;
