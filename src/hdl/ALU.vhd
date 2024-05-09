@@ -36,8 +36,8 @@ use ieee.numeric_std.all;
 
 entity ALU is
     Port(
-        i_A : in std_logic_vector(7 downto 0);
-        i_B : in std_logic_vector(7 downto 0);
+        i_A : in std_logic_vector(7 downto 0):= "00000000";
+        i_B : in std_logic_vector(7 downto 0) := "00000000";
         i_op : in std_logic_vector(2 downto 0);
         o_op_result : out  std_logic_vector(7 downto 0);
         o_flag_C : out std_logic;
